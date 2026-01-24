@@ -1,21 +1,40 @@
 import { insertSession } from "@/model/user.model";
-import argon2 from "argon2";
+import bcrypt from "bcrypt";
 import { cookies } from "next/headers";
 
-export const hasingPassword = async (plainPassword) => {
+// export const hasingPassword = async (plainPassword) => {
+//   try {
+//     return await argon2.hash(plainPassword);
+//   } catch (err) {
+//     return null;
+//   }
+// };
+
+// export const verifyPassword = async (plainPassword, hashedPassword) => {
+//   try {
+//     return await argon2.verify(hashedPassword, plainPassword);
+//   } catch (err) {
+//     console.log(err);
+//     return null;
+//   }
+// };
+const SALT_ROUNDS = 10;
+
+export const hashingPassword = async (plainPassword) => {
   try {
-    return await argon2.hash(plainPassword);
+    return await bcrypt.hash(plainPassword, SALT_ROUNDS);
   } catch (err) {
+    console.error("Hashing error:", err);
     return null;
   }
 };
 
 export const verifyPassword = async (plainPassword, hashedPassword) => {
   try {
-    return await argon2.verify(hashedPassword, plainPassword);
+    return await bcrypt.compare(plainPassword, hashedPassword);
   } catch (err) {
-    console.log(err);
-    return null;
+    console.error("Verify error:", err);
+    return false;
   }
 };
 

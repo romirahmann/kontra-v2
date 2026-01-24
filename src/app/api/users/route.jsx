@@ -1,6 +1,6 @@
 import { error, success } from "@/lib/response.config";
 import { getAllUser, getUserByEmail, insertUser } from "@/model/user.model";
-import { hasingPassword } from "@/services/auth.service";
+import { hashingPassword } from "@/services/auth.service";
 
 export async function GET(req, { params }) {
   const { searchParams } = new URL(req.url);
@@ -27,7 +27,7 @@ export async function POST(req, { params }) {
     let emailIsAlready = await getUserByEmail(email);
     if (emailIsAlready) return error("Email is Already Exist", 400);
 
-    let hashedPassword = await hasingPassword(password);
+    let hashedPassword = await hashingPassword(password);
     if (!hashedPassword) return error("Hashing Password Failed!", 401);
 
     let newUser = {

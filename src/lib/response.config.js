@@ -5,7 +5,7 @@ export function success(data, message = "Success") {
       message,
       data,
     },
-    { status: 200 }
+    { status: 200 },
   );
 }
 
@@ -15,6 +15,6 @@ export function error(message, status = 400) {
       success: false,
       message,
     },
-    { status }
+    { status },
   );
 }

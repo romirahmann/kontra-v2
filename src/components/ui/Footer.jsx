@@ -1,6 +1,8 @@
 "use client";
 
+import apiClient from "@/lib/axios.config";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   FaInstagram,
   FaTiktok,
@@ -10,20 +12,34 @@ import {
 } from "react-icons/fa";
 
 export default function Footer({
-  brand = "Awalan News",
   description = "Portal berita digital yang menyajikan informasi aktual, faktual, dan terpercaya.",
-  categories = [],
-  email = "redaksi@awalannews.com",
-  address = "Jakarta, Indonesia",
+
+  email = "kontranarative@gmail.com",
+  address = "Karawang, Indonesia",
   socials = {},
 }) {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await apiClient.get("/api/articles/categories");
+      setCategories(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <footer className="bg-black text-gray-300 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 py-12 grid gap-10 md:grid-cols-4">
         {/* Brand */}
         <div>
           <h2 className="text-xl font-bold text-white tracking-wide">
-            {brand}
+            Kontra <span className="text-[#800000]">Narative</span>
             <span className="text-maroon-600">.</span>
           </h2>
           <p className="mt-3 text-sm leading-relaxed">{description}</p>
@@ -117,7 +133,8 @@ export default function Footer({
       {/* Copyright */}
       <div className="border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-6 text-center text-xs text-gray-400">
-          © {new Date().getFullYear()} {brand}. Seluruh hak cipta dilindungi.
+          © {new Date().getFullYear()} {"Kontra Narative"}. Seluruh hak cipta
+          dilindungi.
         </div>
       </div>
     </footer>

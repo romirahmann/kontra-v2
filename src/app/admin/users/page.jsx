@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/immutability */
 "use client";
 import UserForm from "@/components/admin/users/FormUser";
+import ConfirmModal from "@/components/shared/ConfirmModal";
 import DataTable from "@/components/shared/DataTable";
 import Modal from "@/components/shared/Modal";
 import PageHeader from "@/components/shared/PageHeader";
+import { useAlert } from "@/context/AlertContext";
 import apiClient from "@/lib/axios.config";
 import { useEffect, useState } from "react";
 
@@ -13,6 +15,7 @@ export default function UserPageManagement() {
   const [page, setPage] = useState(1);
   const [users, setUser] = useState([]);
   const [modal, setModal] = useState({ isOpen: false, type: "", data: {} });
+  const { showAlert } = useAlert();
   useEffect(() => {
     fetchUser();
   }, []);
@@ -24,6 +27,23 @@ export default function UserPageManagement() {
       setUser(res.data);
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const handleDeleted = async () => {
+    if (!modal.data || !modal.data.id)
+      return showAlert("User data is missing.");
+
+    try {
+      let res = await apiClient.delete(`/api/users/${modal.data.id}`);
+
+      showAlert("success", "User deleted successfully.");
+      fetchUser();
+    } catch (err) {
+      console.log("Error deleting user:", err);
+      showAlert("error", "Failed to delete user.");
+    } finally {
+      setModal({ isOpen: false, type: "", data: {} });
     }
   };
 
@@ -59,7 +79,9 @@ export default function UserPageManagement() {
           </button>
 
           <button
-            onClick={() => handleDeleted(row)}
+            onClick={() =>
+              setModal({ isOpen: true, type: "DELETE", data: row })
+            }
             className="text-red-600 hover:text-red-700"
           >
             <FaTrash />
@@ -109,6 +131,15 @@ export default function UserPageManagement() {
           onSubmit={handleSubmit}
         />
       </Modal>
+      <ConfirmModal
+        open={modal.type === "DELETE"}
+        title="Delete User"
+        description="Are you sure you want to delete this user? This action cannot be undone."
+        onClose={() => setModal({ isOpen: false, type: "", data: {} })}
+        onConfirm={handleDeleted}
+        variant="danger"
+        confirmText="Delete"
+      ></ConfirmModal>
     </>
   );
 }

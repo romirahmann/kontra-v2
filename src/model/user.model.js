@@ -13,7 +13,7 @@ export const getAllUser = async ({ is_active, search }) => {
       "u.is_active",
       "u.created_at",
       "u.updated_at",
-      "r.name as roleName"
+      "r.name as roleName",
     )
     .leftJoin("roles as r", "r.id", "u.role_id");
 
@@ -26,7 +26,7 @@ export const getAllUser = async ({ is_active, search }) => {
       qb.where("u.name", "like", `%${search}%`).orWhere(
         "u.email",
         "like",
-        `%${search}%`
+        `%${search}%`,
       );
     });
   }
@@ -47,7 +47,7 @@ export const getUserByEmail = async (email) => {
       "u.is_active",
       "u.created_at",
       "u.updated_at",
-      "r.name as roleName"
+      "r.name as roleName",
     )
     .leftJoin("roles as r", "r.id", "u.role_id")
     .where("u.email", email)
@@ -68,7 +68,7 @@ export const getUserById = async (id) => {
       "u.is_active",
       "u.created_at",
       "u.updated_at",
-      "r.name as roleName"
+      "r.name as roleName",
     )
     .leftJoin("roles as r", "r.id", "u.role_id")
     .where("u.id", id)
@@ -93,7 +93,7 @@ export const getUserByToken = async (token) => {
       "u.is_active",
       "u.created_at",
       "u.updated_at",
-      "r.name as roleName"
+      "r.name as roleName",
     )
     .leftJoin("roles as r", "r.id", "u.role_id")
     .where("u.id", session.user_id)
@@ -121,6 +121,10 @@ export const getAllRole = async () => {
 };
 export const insertRole = async (data) => {
   return db("roles").insert(data);
+};
+
+export const getRoleByName = async (name) => {
+  return db("roles").where("name", name).first();
 };
 
 // SESSION
