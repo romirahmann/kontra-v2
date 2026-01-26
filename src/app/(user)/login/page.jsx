@@ -1,22 +1,12 @@
 "use client";
 
 import FormLogin from "@/components/auth/FormLogin";
-import { useAlert } from "@/context/AlertContext";
+
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+
 export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
-  const searchParams = useSearchParams();
-  const reason = searchParams.get("reason");
-  const { showAlert } = useAlert();
-
-  useEffect(() => {
-    if (reason === "unauthorized") {
-      showAlert("error", "Unauthorized");
-    }
-  }, [reason]);
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
       <div className="bg-gray-800 shadow-lg rounded-3xl p-10 w-full max-w-md">
