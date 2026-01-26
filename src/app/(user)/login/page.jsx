@@ -5,6 +5,7 @@ import { useAlert } from "@/context/AlertContext";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
