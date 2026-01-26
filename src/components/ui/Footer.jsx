@@ -116,7 +116,7 @@ export default function Footer({
               <FaMapMarkerAlt className="text-maroon-600" />
               <span>{address}</span>
             </li>
-            <li>
+            {/* <li>
               <Link href="/kebijakan-privasi" className="hover:text-white">
                 Kebijakan Privasi
               </Link>
@@ -125,7 +125,7 @@ export default function Footer({
               <Link href="/pedoman-media-siber" className="hover:text-white">
                 Pedoman Media Siber
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>
