@@ -115,18 +115,19 @@ export default function ArticleEditorPage({
       if (mode === "create") {
         await apiClient.post("/api/articles", payload);
         showAlert("success", "Artikel berhasil dibuat");
-        router.push(`admin/articles/editor`);
+        router.push(`/admin/articles/editor`);
+        return;
       } else {
         await apiClient.patch(`/api/articles/${initialData.slug}`, payload);
         showAlert("success", "Artikel berhasil diperbarui");
-        router.push(`admin/articles/editor/${initialData.slug}/preview`);
+        router.push(`/admin/articles/${initialData.slug}/preview`);
+        return;
       }
 
       setLoading(false);
     } catch (err) {
       console.error(err);
       showAlert("error", err.message || "Gagal menyimpan artikel");
-    } finally {
     }
   };
 

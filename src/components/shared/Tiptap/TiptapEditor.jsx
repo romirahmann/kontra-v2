@@ -9,6 +9,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Heading from "@tiptap/extension-heading";
+import HardBreak from "@tiptap/extension-hard-break";
 
 import { Table } from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
@@ -18,6 +19,7 @@ import TableHeader from "@tiptap/extension-table-header";
 import CustomImage from "@/services/imageStore.service";
 import TiptapToolbar from "./TiptapToolbar";
 import TiptapTableToolbar from "./TiptapTableToolbar";
+import { normalizeHtml } from "@/services/parseTag.service";
 
 export default function TiptapEditor({ value, onChange }) {
   const isInitialContentSet = useRef(false);
@@ -32,6 +34,9 @@ export default function TiptapEditor({ value, onChange }) {
       }),
       Heading.configure({ levels: [2, 3, 4] }),
       Underline,
+      HardBreak.configure({
+        keepMarks: true,
+      }),
       TextAlign.configure({
         types: ["heading", "paragraph", "listItem"],
       }),
@@ -55,22 +60,15 @@ export default function TiptapEditor({ value, onChange }) {
       TableCell,
     ],
 
-    /**
-     * ⚠️ JANGAN setContent di sini
-     * cukup kirim hasil ke parent
-     */
     onUpdate: ({ editor }) => {
+      const rawHtml = editor.getHTML();
       onChange?.({
         json: editor.getJSON(),
-        html: editor.getHTML(),
+        html: normalizeHtml(rawHtml),
       });
     },
   });
 
-  /**
-   * ✅ SET CONTENT HANYA SEKALI
-   * (initial load / edit article)
-   */
   useEffect(() => {
     if (!editor) return;
 
@@ -90,8 +88,12 @@ export default function TiptapEditor({ value, onChange }) {
       <EditorContent
         editor={editor}
         className="
-          prose max-w-none min-h-[420px] p-4
+          prose prose-lg max-w-none min-h-[420px] p-4
           focus:outline-none
+
+          prose-p:my-6
+          prose-headings:mt-8 prose-headings:mb-4
+
           prose-img:rounded-xl
           prose-table:border
         "

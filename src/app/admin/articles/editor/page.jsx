@@ -57,7 +57,6 @@ export default function ListArticlesEditor() {
 
   const handleDelete = async () => {
     try {
-      console.log(confirmDelete.data);
       await apiClient.delete(`/api/articles/${confirmDelete.data.slug}`);
       showAlert("success", "Article deleted successfully");
       fetchArticles();
@@ -83,8 +82,8 @@ export default function ListArticlesEditor() {
           setFilter((f) => ({ ...f, sort, order }))
         }
         onPreview={(a) => router.push(`/admin/articles/${a.slug}/preview`)}
-        onEdit={(a) => router.push(`/admin/articles/${a.slug}/edit`)}
-        onDelete={(val) => setConfirm({ isOpen: true, data: val })} // ✅ sekarang kirim article
+        onEdit={(a) => router.push(`/admin/articles/editor/${a.slug}/edit`)}
+        onDelete={(val) => setConfirm({ isOpen: true, data: val })}
         allowEdit
       />
 

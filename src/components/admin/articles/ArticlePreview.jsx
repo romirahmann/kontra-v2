@@ -1,10 +1,16 @@
 "use client";
 
+import { stripXhtmlNamespace } from "@/services/parseTag.service";
 import dayjs from "dayjs";
 
 export default function ArticlePreview({ article }) {
   const data = Array.isArray(article) ? article[0] : article;
-  console.log(data);
+
+  console.log(
+    "article data:",
+    stripXhtmlNamespace(data.version[0].content_html),
+  );
+
   if (!data) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 text-gray-500">
@@ -95,8 +101,8 @@ export default function ArticlePreview({ article }) {
     prose prose-lg max-w-none
     prose-headings:scroll-mt-24
 
-    prose-p:empty:block
-    prose-p:empty:min-h-[1em]
+    [&>p]:my-6
+    [&>p+ p]:mt-6
 
     prose-img:rounded-xl
     prose-img:shadow-sm
@@ -105,7 +111,7 @@ export default function ArticlePreview({ article }) {
     prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
   "
         dangerouslySetInnerHTML={{
-          __html: latestVersion?.content_html || "",
+          __html: stripXhtmlNamespace(latestVersion?.content_html || ""),
         }}
       />
     </div>

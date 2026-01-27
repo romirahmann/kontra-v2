@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/immutability */
 "use client";
 import apiClient from "@/lib/axios.config";
+import { stripXhtmlNamespace } from "@/services/parseTag.service";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -89,7 +90,7 @@ export default function UserPreview({ article, slug }) {
             <div
               className="prose prose-lg max-w-none"
               dangerouslySetInnerHTML={{
-                __html: latestVersion?.content_html || "",
+                __html: stripXhtmlNamespace(latestVersion?.content_html || ""),
               }}
             />
           </article>

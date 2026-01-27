@@ -19,3 +19,15 @@ export function slugifyTag(text) {
     .replace(/\s+/g, "-") // spasi → dash
     .replace(/-+/g, "-"); // dash dobe
 }
+
+export function normalizeHtml(html) {
+  return html
+    .split(/<br\s*\/?><br\s*\/?>/)
+    .map((p) => `<p>${p.replace(/<br\s*\/?>/g, "")}</p>`)
+    .join("");
+}
+
+export function stripXhtmlNamespace(html) {
+  if (!html) return "";
+  return html.replace(/\sxmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/gi, "");
+}
