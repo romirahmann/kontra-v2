@@ -39,7 +39,7 @@ export default function LayoutAdmin({ children }) {
       <div
         className={clsx(
           "flex flex-col h-full transition-all duration-300 ease-out",
-          sidebarOpen ? "md:pl-[280px]" : "md:pl-0"
+          sidebarOpen ? "md:pl-[280px]" : "md:pl-0",
         )}
       >
         <Topbar

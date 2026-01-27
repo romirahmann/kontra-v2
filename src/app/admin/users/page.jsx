@@ -183,7 +183,7 @@ export default function UserPageManagement() {
             ? "Are you sure you want to inactivate this user?"
             : "Are you sure you want to activate this user?"
         }
-        confirmText={modal.type === "INACTIVED" ? "Inactivate" : "Activate"}
+        confirmText={modal.type === "INACTIVED" ? "Inactivated" : "Activated"}
         onConfirm={() => handleStatusChange(modal.type === "ACTIVED" ? 1 : 0)}
         variant={modal.type === "INACTIVED" ? "warning" : "primary"}
         onClose={() => setModal({ isOpen: false, type: "", data: {} })}
