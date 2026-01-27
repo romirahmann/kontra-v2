@@ -22,7 +22,7 @@ apiClient.interceptors.response.use(
       status: error.response.status,
       message: error.response.data?.message || "Terjadi kesalahan",
     });
-  }
+  },
 );
 
 export default apiClient;

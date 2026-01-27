@@ -114,6 +114,9 @@ export const deletedUser = async (id) => {
   return db("users").where("id", id).del();
 };
 
+export const updateUserStatus = async (id, is_active) => {
+  return db("users").where("id", id).update({ is_active });
+};
 // ROLES
 export const getAllRole = async () => {
   const query = db("roles").select("*");

@@ -57,7 +57,7 @@ export default function UserForm({
         await apiClient.post("/api/users", payload);
         showAlert("success", "User berhasil ditambahkan");
       } else {
-        await apiClient.put(`/api/users/${initialData.username}`, payload);
+        await apiClient.put(`/api/users/${initialData.id}`, payload);
         showAlert("success", "User berhasil diperbarui");
       }
 
@@ -132,25 +132,27 @@ export default function UserForm({
       </Field>
 
       {/* PASSWORD */}
-      <Field
-        label="Password"
-        htmlFor="password"
-        hint={isEdit ? "Kosongkan jika tidak ingin mengubah password" : null}
-      >
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-          minLength={8}
-          required={!isEdit}
-          placeholder={
-            isEdit ? "Password baru (opsional)" : "Minimal 8 karakter"
-          }
-          className="input"
-        />
-      </Field>
+      {mode === "ADD" && (
+        <Field
+          label="Password"
+          htmlFor="password"
+          hint={isEdit ? "Kosongkan jika tidak ingin mengubah password" : null}
+        >
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            minLength={8}
+            required={!isEdit}
+            placeholder={
+              isEdit ? "Password baru (opsional)" : "Minimal 8 karakter"
+            }
+            className="input"
+          />
+        </Field>
+      )}
 
       {/* ACTION */}
       <div className="flex justify-end pt-4">

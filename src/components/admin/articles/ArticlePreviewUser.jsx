@@ -1,12 +1,31 @@
 /* eslint-disable react-hooks/immutability */
 "use client";
 import apiClient from "@/lib/axios.config";
+
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaEye, FaFire, FaArrowLeft } from "react-icons/fa";
 
-export default function UserPreview({ article }) {
+export default function UserPreview({ article, slug }) {
+  const viewedRef = useRef(false);
+
+  useEffect(() => {
+    const key = `viewed_article_${slug}`;
+    if (sessionStorage.getItem(key)) return;
+
+    sessionStorage.setItem(key, "1");
+    apiClient.post(`/api/articles/${slug}/views`).catch(console.error);
+  }, [slug]);
+
+  const recordView = async () => {
+    try {
+      await apiClient.post(`/api/articles/${slug}/views`, { slug });
+    } catch (error) {
+      console.error("Error recording view:", error);
+    }
+  };
+
   const latestVersion =
     Array.isArray(article?.version) && article.version.length > 0
       ? article.version.reduce((latest, current) =>

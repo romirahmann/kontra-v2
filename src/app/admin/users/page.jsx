@@ -8,14 +8,16 @@ import PageHeader from "@/components/shared/PageHeader";
 import { useAlert } from "@/context/AlertContext";
 import apiClient from "@/lib/axios.config";
 import { useEffect, useState } from "react";
-
+import { IoIosCheckbox } from "react-icons/io";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { MdOutlineBlock } from "react-icons/md";
 
 export default function UserPageManagement() {
   const [page, setPage] = useState(1);
   const [users, setUser] = useState([]);
   const [modal, setModal] = useState({ isOpen: false, type: "", data: {} });
   const { showAlert } = useAlert();
+
   useEffect(() => {
     fetchUser();
   }, []);
@@ -78,6 +80,28 @@ export default function UserPageManagement() {
             <FaEdit />
           </button>
 
+          {row.is_active === 0 && (
+            <button
+              onClick={() =>
+                setModal({ isOpen: true, type: "ACTIVED", data: row })
+              }
+              className="text-green-600 hover:text-green-900"
+            >
+              <IoIosCheckbox />
+            </button>
+          )}
+
+          {row.is_active === 1 && (
+            <button
+              onClick={() =>
+                setModal({ isOpen: true, type: "INACTIVED", data: row })
+              }
+              className="text-green-600 hover:text-green-900"
+            >
+              <MdOutlineBlock />
+            </button>
+          )}
+
           <button
             onClick={() =>
               setModal({ isOpen: true, type: "DELETE", data: row })
@@ -94,6 +118,25 @@ export default function UserPageManagement() {
   const handleSubmit = async () => {
     setModal({ isOpen: false, type: "", data: {} });
     fetchUser();
+  };
+
+  const handleStatusChange = async (isActive) => {
+    console.log(isActive);
+
+    try {
+      if (!modal.data || !modal.data.id)
+        return showAlert("User data is missing.");
+
+      await apiClient.patch(`/api/users/${modal.data.id}`, {
+        is_active: isActive,
+      });
+      showAlert("success", "User status actived");
+      fetchUser();
+      setModal({ isOpen: false, type: "", data: {} });
+    } catch (err) {
+      console.log(err);
+      showAlert("error", "Failed to update user status.");
+    }
   };
 
   return (
@@ -131,6 +174,21 @@ export default function UserPageManagement() {
           onSubmit={handleSubmit}
         />
       </Modal>
+
+      <ConfirmModal
+        open={modal.type === "INACTIVED" || modal.type === "ACTIVED"}
+        title={modal.type === "INACTIVED" ? "Inactivate User" : "Activate User"}
+        description={
+          modal.type === "INACTIVED"
+            ? "Are you sure you want to inactivate this user?"
+            : "Are you sure you want to activate this user?"
+        }
+        confirmText={modal.type === "INACTIVED" ? "Inactivate" : "Activate"}
+        onConfirm={() => handleStatusChange(modal.type === "ACTIVED" ? 1 : 0)}
+        variant={modal.type === "INACTIVED" ? "warning" : "primary"}
+        onClose={() => setModal({ isOpen: false, type: "", data: {} })}
+      />
+
       <ConfirmModal
         open={modal.type === "DELETE"}
         title="Delete User"
