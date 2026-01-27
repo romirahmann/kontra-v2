@@ -1,3 +1,5 @@
+import db from "@/lib/db.config";
+
 export async function GET() {
   try {
     await db.raw("SELECT 1");
