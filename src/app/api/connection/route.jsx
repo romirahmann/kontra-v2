@@ -1,13 +1,28 @@
-import { error, success } from "@/lib/response.config";
-
-export async function GET(req, { params }) {
+export async function GET() {
   try {
-    return success(
-      { message: "Connection successful" },
-      "Connection successful",
+    await db.raw("SELECT 1");
+
+    return new Response(
+      JSON.stringify({
+        status: "ok",
+        services: {
+          database: "up",
+          api: "up",
+        },
+        timestamp: new Date().toISOString(),
+      }),
+      { status: 200 },
     );
   } catch (err) {
-    console.log(err);
-    return error("Internal Server Error", 500);
+    return new Response(
+      JSON.stringify({
+        status: "error",
+        services: {
+          database: "down",
+        },
+        error: err.message,
+      }),
+      { status: 500 },
+    );
   }
 }
