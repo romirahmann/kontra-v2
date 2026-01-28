@@ -19,6 +19,13 @@ export async function GET() {
     return new Response(
       JSON.stringify({
         status: "error",
+        connection: {
+          DB_HOST: process.env.DB_HOST || "not set",
+          DB_NAME: process.env.DB_NAME || "not set",
+          DB_PORT: process.env.DB_PORT || "not set",
+          DB_PASSWORD: process.env.DB_PASSWORD ? "set" : "not set",
+          DB_USER: process.env.DB_USER || "not set",
+        },
         services: {
           database: "down",
         },

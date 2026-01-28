@@ -25,7 +25,7 @@ export default function HomePage() {
   const fetchArticles = async () => {
     try {
       const res = await apiClient.get("/api/articles/homepage");
-      console.log(res.data);
+      // console.log(res.data);
       setHighlight(res.data.highlight || null);
       setTrending(res.data.trending || []);
       setLatest(res.data.latest || []);

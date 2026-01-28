@@ -3,7 +3,7 @@ import { getAllArticlesForHome } from "@/model/articles.model";
 
 export async function GET(req, { params }) {
   const { searchParams } = new URL(req.url);
-  const sort = searchParams.get("sort");
+  const sort = searchParams.get("sort") || null;
   const order = searchParams.get("order") || "desc";
   const status = searchParams.get("status") || null;
   const limit = Number(searchParams.get("limit") || 25);
@@ -20,6 +20,6 @@ export async function GET(req, { params }) {
     return success(result, "Get Articles successfully!");
   } catch (err) {
     console.log(err);
-    return error("Internal Server Error", 500);
+    return error(`INTERNAL SERVER ERROR`, 500);
   }
 }
