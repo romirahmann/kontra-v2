@@ -17,30 +17,32 @@ import {
 import PopularArticles from "./PopulerArticles";
 import ClickChart from "./ClickChart";
 
-const articleTrafficData = [
-  { title: "Kopi Lokal Naik Daun", views: 1240 },
-  { title: "Matcha vs Espresso", views: 980 },
-  { title: "Cafe Cozy di Jakarta", views: 1520 },
-  { title: "Manual Brew untuk Pemula", views: 760 },
-  { title: "Rahasia Latte Art", views: 1890 },
-];
-
 export default function EditorDashboard({ user }) {
   const [dataDashboard, setDataDashboard] = useState([]);
 
   useEffect(() => {
-    fetchData();
+    fetchDataDashboardEditor();
   }, []);
 
-  const fetchData = async () => {
+  const fetchDataDashboardEditor = async () => {
+    if (!user) return;
     try {
-      let res = await apiClient(`/api/articles/author/${user.id}/dashboard`);
+      let res = await apiClient.get(
+        `/api/articles/author/${user.id}/dashboard`,
+      );
       // console.log(res.data);
       setDataDashboard(res.data);
+      setArticleTrafficData(res.data.traffic_views);
     } catch (error) {
       console.log(error);
     }
   };
+
+  const trafficData = Array.isArray(dataDashboard?.traffic_views)
+    ? dataDashboard.traffic_views
+    : [];
+
+  const hasData = trafficData.length > 0;
 
   return (
     <div className="space-y-8">
@@ -50,7 +52,7 @@ export default function EditorDashboard({ user }) {
       </header>
 
       <section className="grid sm:grid-cols-3 gap-6">
-        <KPI title="Total Article" value={`${dataDashboard.total_articles}`} />
+        <KPI title="Total Article" value={`${dataDashboard.total_article}`} />
         <KPI title="Menunggu Review" value={`${dataDashboard.under_review}`} />
         <KPI title="Ditolak" value={`${dataDashboard.rejected}`} />
       </section>
@@ -59,13 +61,13 @@ export default function EditorDashboard({ user }) {
         <section className="bg-white border rounded-2xl p-5">
           <h3 className="font-semibold mb-4">Trending Articles 🔥</h3>
 
-          <TrendingList />
+          <TrendingList data={dataDashboard.trending} />
         </section>
 
         <div className="bg-white border rounded-2xl p-5">
           <h3 className="font-semibold mb-4">Artikel Terpopuler</h3>
 
-          <PopularArticles />
+          <PopularArticles data={dataDashboard.populer} />
         </div>
       </div>
 
@@ -79,30 +81,55 @@ export default function EditorDashboard({ user }) {
             </p>
           </div>
 
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart
-              data={articleTrafficData}
-              layout="vertical"
-              margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
-            >
-              {/* Axis */}
-              <XAxis type="number" />
-              <YAxis
-                type="category"
-                dataKey="title"
-                width={160}
-                tick={{ fontSize: 12 }}
-              />
+          <div className="bg-white rounded-xl border border-gray-100 p-4 h-[360px]">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">
+              Traffic Artikel
+            </h3>
 
-              {/* Tooltip */}
-              <Tooltip formatter={(value) => value.toLocaleString()} />
-
-              {/* Bar */}
-              <Bar dataKey="views" radius={[0, 6, 6, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+            {hasData ? (
+              <ResponsiveContainer width="100%" height={320}>
+                <BarChart
+                  data={trafficData}
+                  layout="vertical"
+                  margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+                >
+                  <XAxis
+                    type="number"
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(v) => v.toLocaleString()}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="title"
+                    width={160}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <Tooltip formatter={(value) => value.toLocaleString()} />
+                  <Bar dataKey="views" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyTrafficState />
+            )}
+          </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+function EmptyTrafficState() {
+  return (
+    <div className="flex flex-col items-center justify-center h-[280px] text-center">
+      <div className="w-12 h-12 mb-3 rounded-full bg-gray-100 flex items-center justify-center">
+        📊
+      </div>
+      <p className="text-sm font-medium text-gray-600">
+        Belum ada data traffic
+      </p>
+      <p className="text-xs text-gray-400 mt-1">
+        Artikel kamu belum memiliki kunjungan
+      </p>
     </div>
   );
 }

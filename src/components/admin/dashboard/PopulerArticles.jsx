@@ -1,12 +1,6 @@
 "use client";
 
-export default function PopularArticles() {
-  const data = [
-    { title: "Harga BBM Terbaru", views: "120K" },
-    { title: "Tips UMKM Bertahan", views: "98K" },
-    { title: "AI di Dunia Jurnalistik", views: "86K" },
-  ];
-
+export default function PopularArticles({ data = [] }) {
   return (
     <ul className="space-y-3">
       {data.map((a, i) => (

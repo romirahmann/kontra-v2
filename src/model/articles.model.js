@@ -58,9 +58,12 @@ export const getAllArticlesForHome = async ({
       "c.id as category_id",
       "c.name as category_name",
       "c.slug as category_slug",
+      "vs.unique_views ",
+      "vs.total_views ",
     )
     .leftJoin("users as u", "u.id", "a.author_id")
     .leftJoin("categories as c", "c.id", "a.category_id")
+    .leftJoin("article_view_stats as vs", "vs.article_id", "a.id")
     .where("a.status", "published")
     .orderBy("a.published_at", "desc");
 
@@ -75,14 +78,8 @@ export const getAllArticlesForHome = async ({
 
   const enriched = await Promise.all(rows.map(enrichArticle));
 
-  /* =========================
-     HIGHLIGHT (1 TERBARU)
-  ========================= */
   const highlight = enriched[0];
 
-  /* =========================
-     LATEST (4 SETELAH HIGHLIGHT)
-  ========================= */
   const latest = enriched.slice(1, 5);
 
   /* =========================
@@ -91,7 +88,7 @@ export const getAllArticlesForHome = async ({
   ========================= */
   const trending = enriched
     .filter((a) => a.id !== highlight.id)
-    .sort((a, b) => (b.views || 0) - (a.views || 0))
+    .sort((a, b) => (b.unique_views || 0) - (a.unique_views || 0))
     .slice(0, 5);
 
   /* =========================
@@ -536,23 +533,92 @@ export const reviewArticle = async (slug, status, reviewer_id, note) => {
   return true;
 };
 
-export const getUserArticleDashboard = async (userId) => {
-  const result = await db("articles")
-    .where("author_id", userId)
-    .select(
-      db.raw("COUNT(*) as total_articles"),
-      db.raw(
-        "SUM(CASE WHEN status IN ('submitted', 'under_review') THEN 1 ELSE 0 END) as under_review",
-      ),
-      db.raw(
-        "SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected",
-      ),
-    )
-    .first();
+// export const getUserArticleDashboard = async (userId) => {
 
-  return {
-    total_articles: Number(result.total_articles) || 0,
-    under_review: Number(result.under_review) || 0,
-    rejected: Number(result.rejected) || 0,
-  };
+//   const result = await db("articles as a")
+//     .where("author_id", userId)
+//     .select(
+//       "a.*",
+//       "u.fullName as author_name",
+//       "c.id as category_id",
+//       "c.name as category_name",
+//       "c.slug as category_slug",
+//       "vs.unique_views ",
+//       "vs.total_views ",
+//       db.raw("COUNT(*) as total_articles"),
+//       db.raw(
+//         "SUM(CASE WHEN status IN ('submitted', 'under_review') THEN 1 ELSE 0 END) as under_review",
+//       ),
+//       db.raw(
+//         "SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected",
+//       ),
+//     )
+//     .leftJoin("users as u", "u.id", "a.author_id")
+//     .leftJoin("categories as c", "c.id", "a.category_id")
+//     .leftJoin("article_view_stats as vs", "vs.article_id", "a.id")
+//     .first();
+
+//   return {
+//     total_articles: Number(result.total_articles) || 0,
+//     under_review: Number(result.under_review) || 0,
+//     rejected: Number(result.rejected) || 0,
+//   };
+// };
+export const getUserArticleDashboard = async (userId) => {
+  return db.transaction(async (trx) => {
+    const articleStats = await trx("articles as a")
+      .where("author_id", userId)
+      .select(
+        db.raw("COUNT(*) as total_articles"),
+        db.raw(
+          "SUM(CASE WHEN status IN ('submitted','under_review') THEN 1 ELSE 0 END) as under_review",
+        ),
+        db.raw(
+          "SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected",
+        ),
+      )
+      .first();
+
+    const trafficViews = await trx("articles as a")
+      .leftJoin("article_view_stats as vs", "vs.article_id", "a.id")
+      .where("a.author_id", userId)
+      .select("a.title", db.raw("COALESCE(vs.total_views, 0) as views"))
+      .orderBy("views", "desc");
+    const trending = await trx("articles as a")
+      .leftJoin("article_view_stats as vs", "vs.article_id", "a.id")
+      .leftJoin("categories as c", "c.id", "a.category_id")
+      .where("a.author_id", userId)
+      .orderBy("vs.total_views", "desc")
+      .limit(5)
+      .select(
+        "a.id",
+        "a.title",
+        "a.slug",
+        "c.name as category",
+        "vs.total_views",
+      );
+
+    const populer = await trx("articles as a")
+      .leftJoin("article_view_stats as vs", "vs.article_id", "a.id")
+      .where("a.author_id", userId)
+      .orderBy("vs.unique_views", "desc")
+      .limit(5)
+      .select("a.id", "a.title", "a.slug", "vs.unique_views");
+
+    // const trafficViews = await trx("articles as a")
+    //   .select("a.title", "vs.total_views", "vs.unique_views")
+    //   .leftJoin("article_view_stats as vs", "vs.article_id", "a.id")
+    //   .where("a.author_id", userId);
+
+    return {
+      total_article: Number(articleStats?.total_articles || 0),
+      under_review: Number(articleStats?.under_review || 0),
+      rejected: Number(articleStats?.rejected || 0),
+
+      traffic_views: trafficViews || [],
+
+      trending,
+      populer,
+    };
+  });
 };
