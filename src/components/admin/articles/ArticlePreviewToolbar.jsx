@@ -29,7 +29,7 @@ export default function ArticlePreviewToolbar({ article, slug }) {
     try {
       let res = await apiClient.patch(
         `/api/articles/approval/${article.id}/actions`,
-        payload
+        payload,
       );
       console.log(res);
       showAlert("success", "Article updated successfully");

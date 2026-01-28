@@ -88,7 +88,7 @@ export default function UserPreview({ article, slug }) {
             )}
 
             <div
-              className="prose prose-lg max-w-none"
+              className="prose prose-lg max-w-none prose-headings:scroll-mt-24 [&>p]:my-6 [&>p+ p]:mt-6"
               dangerouslySetInnerHTML={{
                 __html: stripXhtmlNamespace(latestVersion?.content_html || ""),
               }}
