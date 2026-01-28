@@ -1,5 +1,13 @@
 import knex from "knex";
 
+console.log("ENV CHECK SERVER:", {
+  DB_HOST: process.env.DB_HOST,
+  DB_NAME: process.env.DB_NAME,
+  DB_PORT: process.env.DB_PORT,
+  DB_USER: process.env.DB_USER,
+  DB_PASSWORD: process.env.DB_PASSWORD ? "SET" : "NOT SET",
+});
+
 const db = knex({
   client: "mysql2",
   connection: {
