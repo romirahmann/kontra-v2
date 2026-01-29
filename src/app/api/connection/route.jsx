@@ -1,5 +1,5 @@
 import db from "@/lib/db.config";
-
+export const runtime = "nodejs";
 export async function GET() {
   try {
     await db.raw("SELECT 1");
